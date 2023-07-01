@@ -3,7 +3,7 @@
 
 git clone <このgitのURL>
 
-cd ./Practice-of-Information-Systems-2nd-API
+cd Team7/
 
 //自分のブランチを新しく作って，そこで作業する
 
