@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 
 class test_page extends StatefulWidget {
-
   @override
   State<test_page> createState() => _test_pageState();
 }
 
 class _test_pageState extends State<test_page> {
-
   //画像の状態をtrueに設定
   bool _showFirstImage = true;
   //正解した回数
@@ -27,23 +25,21 @@ class _test_pageState extends State<test_page> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:Text('test'),
+        title: Text('test'),
       ),
       body: Column(
         children: <Widget>[
           //画像を表示
           Center(
             child: _showFirstImage
-              //TODO:画像の名前を受け取り、表示する(pngのところと入れ替え)
-                ? Image.asset('images/gengou_document_heisei.png',
-                  fit: BoxFit.fill)
-                : Image.asset('images/gengou_document_reiwa.png',
-                  fit: BoxFit.fill),
+                //TODO:画像の名前を受け取り、表示する(pngのところと入れ替え)
+                ? Image.asset('images/sample.jpg', fit: BoxFit.fill)
+                : Image.asset('images/test1.png', fit: BoxFit.fill),
           ),
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
-              children:<Widget>[
+              children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
@@ -53,13 +49,14 @@ class _test_pageState extends State<test_page> {
                         children: <Widget>[
                           //正解したときに押すボタン
                           TextButton(
-                            style: TextButton.styleFrom(backgroundColor: Colors.green),
-                            onPressed: (){
+                            style: TextButton.styleFrom(
+                                backgroundColor: Colors.green),
+                            onPressed: () {
                               setState(() {
-                                rightNumber ++;
+                                rightNumber++;
                               });
                             },
-                            child:const Text(
+                            child: const Text(
                               '正解した！',
                               style: TextStyle(
                                 color: Colors.white,
@@ -70,7 +67,7 @@ class _test_pageState extends State<test_page> {
                           Container(
                             child: Text(
                               '$rightNumber',
-                              textAlign:TextAlign.center,
+                              textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 50,
                               ),
@@ -82,13 +79,14 @@ class _test_pageState extends State<test_page> {
                         children: <Widget>[
                           //間違えたときに押すボタン
                           TextButton(
-                            style: TextButton.styleFrom(backgroundColor: Colors.red),
-                            onPressed: (){
+                            style: TextButton.styleFrom(
+                                backgroundColor: Colors.red),
+                            onPressed: () {
                               setState(() {
-                                wrongNumber ++;
+                                wrongNumber++;
                               });
                             },
-                            child:const Text(
+                            child: const Text(
                               '間違えた…',
                               style: TextStyle(
                                 color: Colors.white,
@@ -99,7 +97,7 @@ class _test_pageState extends State<test_page> {
                           Container(
                             child: Text(
                               '$wrongNumber',
-                              textAlign:TextAlign.center,
+                              textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 50,
                               ),

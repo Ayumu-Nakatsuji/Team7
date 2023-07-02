@@ -2,17 +2,16 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'secondPage.dart';
+import 'edit.dart';
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
+class MyHomePage1 extends StatefulWidget {
+  const MyHomePage1({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MyHomePage1> createState() => _MyHomePage1State();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePage1State extends State<MyHomePage1> {
   final ImagePicker picker = ImagePicker();
   File? image;
 
@@ -63,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
           setState(() {
             _saveImage(image);
             Navigator.push(
-                context, MaterialPageRoute(builder: (context) => SecondPage()));
+                context, MaterialPageRoute(builder: (context) => Edit()));
           });
         },
       );
@@ -104,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Text('a'),
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it

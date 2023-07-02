@@ -4,10 +4,12 @@ import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart' as path_provider;
-import 'package:team7/main.dart';
 import 'dart:ui' as ui;
 import 'expandable_fab.dart';
 import 'package:intl/intl.dart';
+import 'test_page.dart';
+import 'package:team7/MyHomepage.dart';
+import 'package:path_provider/path_provider.dart';
 
 /*
 @immutable
@@ -344,7 +346,7 @@ class _MyHomePageState extends State<MyHomePage> {
               right: 0,
               bottom: 0,
               child: Image(
-                  image: AssetImage('images/test.png'), fit: BoxFit.contain),
+                  image: AssetImage('images/sample.jpg'), fit: BoxFit.contain),
             ),
             Flex(
               direction: Axis.vertical,
@@ -383,7 +385,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => HomeScreen()),
+                                  builder: (context) => MyHomePage1()),
                             );
                           },
                           child: Icon(Icons.arrow_back),
@@ -391,7 +393,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
                         SizedBox(width: 16), // ボタン間のスペースを作成
                         FloatingActionButton(
-                          onPressed: () => print('Clicked 2!'),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => test_page()),
+                            );
+                          },
                           child: Icon(Icons.arrow_forward),
                         ),
                       ],
