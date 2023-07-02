@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Team7 prototype'),
     );
   }
 }
@@ -33,15 +33,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
   final ImagePicker picker = ImagePicker();
   File? image;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
 
   Future _getPicture() async {
     final pickedFile =
@@ -53,6 +46,42 @@ class _MyHomePageState extends State<MyHomePage> {
         image = File(pickedFile.path); //取得した画像を代入
       }
     });
+  }
+
+  Future _getPictureCamera() async {
+    final pickedFile =
+        await picker.pickImage(source: ImageSource.camera); //カメラから画像を取得
+    setState(() {
+      //画面を再読込
+      if (pickedFile != null) {
+        //画像を取得できたときのみ実行
+        image = File(pickedFile.path); //取得した画像を代入
+      }
+    });
+  }
+
+  TextButton _sendbutton() {
+    if (image == null) {
+      return TextButton(
+        child: Text(
+          'save image',
+          style: TextStyle(color: Colors.black, fontSize: 30),
+        ),
+        style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all<Color>(Colors.grey)),
+        onPressed: () {},
+      );
+    } else {
+      return TextButton(
+        child: Text(
+          'save image',
+          style: TextStyle(color: Colors.black, fontSize: 30),
+        ),
+        style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all<Color>(Colors.green)),
+        onPressed: () {},
+      );
+    }
   }
 
   @override
@@ -73,30 +102,67 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            // const Text(
-            //   'You have pushed the button this many times:',
-            // ),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 80,
+                    height: 80,
+                    child: FloatingActionButton(
+                      onPressed: _getPictureCamera,
+                      child: const Icon(
+                        Icons.camera_alt,
+                        size: 50,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 100),
+                  Container(
+                    width: 80,
+                    height: 80,
+                    child: FloatingActionButton(
+                      onPressed: _getPicture,
+                      child: const Icon(
+                        Icons.image,
+                        size: 50,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             const SizedBox(height: 5),
             //nullのときはText表示、nullでないときはContainer表示
             image == null
-                ? const Text('画像が選択されてません')
+                ? Container(
+                    color: Colors.grey[200],
+                    height: 400,
+                    width: 200, //画像の高さを設定//画像の幅を設定
+                    child: Text('画像が選択されていません',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w600)), //画像を表示
+                  )
                 : Container(
                     //三項演算子
-                    height: 400, //画像の高さを設定//画像の幅を設定
+                    height: 400,
+                    width: 200,
                     child: Image.file(image!, fit: BoxFit.cover), //画像を表示
                   ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(70),
+                child: SizedBox(height: 30, child: _sendbutton()),
+              ),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _getPicture,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: _getPicture,
+      //   tooltip: 'Increment',
+      //   child: const Icon(Icons.add),
+      // ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
