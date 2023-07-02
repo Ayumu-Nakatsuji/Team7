@@ -8,10 +8,19 @@ class test_page extends StatefulWidget {
 
 class _test_pageState extends State<test_page> {
 
+  //画像の状態をtrueに設定
+  bool _showFirstImage = true;
   //正解した回数
   int rightNumber = 0;
   //間違えた回数
   int wrongNumber = 0;
+
+  //画像の状態を変更
+  void _switchImage() {
+    setState(() {
+      _showFirstImage = !_showFirstImage;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +30,15 @@ class _test_pageState extends State<test_page> {
       ),
       body: Column(
         children: <Widget>[
-          //TODO:画像の表示と押すと回答が出るWidgetをここに入れる
+          //画像を表示
+          Center(
+            child: _showFirstImage
+              //TODO:画像の名前を受け取り、表示する(pngのところと入れ替え)
+                ? Image.asset('images/gengou_document_heisei.png',
+              fit: BoxFit.fill)
+                : Image.asset('images/gengou_document_reiwa.png',
+                fit: BoxFit.fill),
+          ),
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -90,6 +107,11 @@ class _test_pageState extends State<test_page> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _switchImage,
+        tooltip: 'Switch Image',
+        child: Icon(Icons.swap_horiz),
       ),
     );
   }
