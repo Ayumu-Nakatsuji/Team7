@@ -1,168 +1,312 @@
-import 'dart:io';
-
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Image Editor',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Team7 prototype'),
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final ImagePicker picker = ImagePicker();
   File? image;
+  final picker = ImagePicker();
+  List<Offset> points = <Offset>[];
+  Color penColor = Colors.black;
+  double penSize = 5.0;
+  bool isErasing = false;
 
-  Future _getPicture() async {
-    final pickedFile =
-        await picker.pickImage(source: ImageSource.gallery); //カメラから画像を取得
+  Future getImageFromCamera() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
     setState(() {
-      //画面を再読込
       if (pickedFile != null) {
-        //画像を取得できたときのみ実行
-        image = File(pickedFile.path); //取得した画像を代入
+        image = File(pickedFile.path);
+        points = [];
       }
     });
   }
 
-  Future _getPictureCamera() async {
-    final pickedFile =
-        await picker.pickImage(source: ImageSource.camera); //カメラから画像を取得
+  Future getImageFromGallery() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     setState(() {
-      //画面を再読込
       if (pickedFile != null) {
-        //画像を取得できたときのみ実行
-        image = File(pickedFile.path); //取得した画像を代入
+        image = File(pickedFile.path);
+        points = [];
       }
     });
   }
 
-  TextButton _sendbutton() {
+  void saveImage() async {
     if (image == null) {
-      return TextButton(
-        child: Text(
-          'save image',
-          style: TextStyle(color: Colors.black, fontSize: 30),
-        ),
-        style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(Colors.grey)),
-        onPressed: () {},
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('画像がありません')),
       );
-    } else {
-      return TextButton(
-        child: Text(
-          'save image',
-          style: TextStyle(color: Colors.black, fontSize: 30),
-        ),
-        style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(Colors.green)),
-        onPressed: () {},
+      return;
+    }
+
+    try {
+      final result = await image!.copy(
+        '${Directory.systemTemp.path}/image.png',
+      );
+
+      if (result != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('画像が保存されました')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('画像の保存に失敗しました')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('画像の保存に失敗しました')),
       );
     }
+  }
+
+  void _startDrawing(DragStartDetails details) {
+    setState(() {
+      final RenderBox box = context.findRenderObject() as RenderBox;
+      final Offset point = box.globalToLocal(details.globalPosition);
+      points = List.from(points)..add(point);
+    });
+  }
+
+  void _updateDrawing(DragUpdateDetails details) {
+    setState(() {
+      final RenderBox box = context.findRenderObject() as RenderBox;
+      final Offset point = box.globalToLocal(details.globalPosition);
+      points = List.from(points)..add(point);
+    });
+  }
+
+  void _stopDrawing() {
+    setState(() {
+      points.add(Offset.infinite);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: const Text('Image Editor'),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 80,
-                    height: 80,
-                    child: FloatingActionButton(
-                      onPressed: _getPictureCamera,
-                      child: const Icon(
-                        Icons.camera_alt,
-                        size: 50,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 100),
-                  Container(
-                    width: 80,
-                    height: 80,
-                    child: FloatingActionButton(
-                      onPressed: _getPicture,
-                      child: const Icon(
-                        Icons.image,
-                        size: 50,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                getImageFromCamera();
+              },
+              child: const Text('カメラから画像を取得'),
             ),
             const SizedBox(height: 5),
-            //nullのときはText表示、nullでないときはContainer表示
-            image == null
-                ? Container(
-                    color: Colors.grey[200],
-                    height: 400,
-                    width: 200, //画像の高さを設定//画像の幅を設定
-                    child: Text('画像が選択されていません',
-                        style: TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.w600)), //画像を表示
-                  )
-                : Container(
-                    //三項演算子
-                    height: 400,
-                    width: 200,
-                    child: Image.file(image!, fit: BoxFit.cover), //画像を表示
+            ElevatedButton(
+              onPressed: () {
+                getImageFromGallery();
+              },
+              child: const Text('アルバムから画像を取得'),
+            ),
+            const SizedBox(height: 20),
+            if (image != null)
+              GestureDetector(
+                onPanStart: (details) => _startDrawing(details),
+                onPanUpdate: (details) => _updateDrawing(details),
+                onPanEnd: (details) => _stopDrawing(),
+                child: CustomPaint(
+                  painter: ImageEditorPainter(
+                    image: image!,
+                    points: points,
+                    penColor: penColor,
+                    penSize: penSize,
+                    isErasing: isErasing,
                   ),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(70),
-                child: SizedBox(height: 30, child: _sendbutton()),
+                  child: Container(
+                    height: 400,
+                    width: 300,
+                  ),
+                ),
               ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      penColor = Colors.black;
+                      isErasing = false;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.black,
+                    fixedSize: const Size(50, 50),
+                  ),
+                  child: const SizedBox(),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      penColor = Colors.red;
+                      isErasing = false;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red,
+                    fixedSize: const Size(50, 50),
+                  ),
+                  child: const SizedBox(),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      penColor = Colors.green;
+                      isErasing = false;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.green,
+                    fixedSize: const Size(50, 50),
+                  ),
+                  child: const SizedBox(),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      penColor = Colors.blue;
+                      isErasing = false;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.blue,
+                    fixedSize: const Size(50, 50),
+                  ),
+                  child: const SizedBox(),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      isErasing = true;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.white,
+                    fixedSize: const Size(50, 50),
+                    side: const BorderSide(color: Colors.black),
+                  ),
+                  child: const Icon(Icons.delete, color: Colors.black),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    saveImage();
+                  },
+                  child: const Text('画像を保存'),
+                ),
+              ],
             ),
           ],
         ),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: _getPicture,
-      //   tooltip: 'Increment',
-      //   child: const Icon(Icons.add),
-      // ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
+
+class ImageEditorPainter extends CustomPainter {
+  final File image;
+  final List<Offset> points;
+  final Color penColor;
+  final double penSize;
+  final bool isErasing;
+
+  ImageEditorPainter({
+    required this.image,
+    required this.points,
+    required this.penColor,
+    required this.penSize,
+    required this.isErasing,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final imageRect = Offset.zero & size;
+    final imageProvider = FileImage(image);
+    imageProvider.resolve(const ImageConfiguration()).addListener(
+      ImageStreamListener((info, _) {
+        canvas.drawImageRect(
+          info.image,
+          imageRect,
+          imageRect,
+          Paint(),
+        );
+      }),
+    );
+
+    Paint paint = Paint()
+      ..color = penColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = penSize;
+
+    if (isErasing) {
+      paint.blendMode = BlendMode.clear;
+    }
+
+    for (int i = 1; i < points.length; i++) {
+      if (points[i - 1].dx.isFinite && points[i].dx.isFinite) {
+        canvas.drawLine(points[i - 1], points[i], paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
+// import 'package:flutter/material.dart';
+// import 'package:team7/MyHomepage.dart';
+//
+// void main() {
+//   runApp(const MyApp());
+// }
+//
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
+//
+//   // This widget is the root of your application.
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'Flutter Demo',
+//       theme: ThemeData(
+//         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+//         useMaterial3: true,
+//       ),
+//       home: const MyHomePage(title: 'Team7 prototype'),
+//     );
+//   }
+// }
