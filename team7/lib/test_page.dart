@@ -14,6 +14,7 @@ class _test_pageState extends State<test_page> {
   int rightNumber = 0;
   //間違えた回数
   int wrongNumber = 0;
+  //
 
   //画像の状態を変更
   void _switchImage() {
@@ -35,9 +36,9 @@ class _test_pageState extends State<test_page> {
             child: _showFirstImage
               //TODO:画像の名前を受け取り、表示する(pngのところと入れ替え)
                 ? Image.asset('images/gengou_document_heisei.png',
-              fit: BoxFit.fill)
+                  fit: BoxFit.fill)
                 : Image.asset('images/gengou_document_reiwa.png',
-                fit: BoxFit.fill),
+                  fit: BoxFit.fill),
           ),
           Expanded(
             child: Column(
@@ -58,8 +59,11 @@ class _test_pageState extends State<test_page> {
                                 rightNumber ++;
                               });
                             },
-                            child: Text(
-                                '正解した！'
+                            child:const Text(
+                              '正解した！',
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                           //正解ボタンを押した回数を表示
@@ -84,8 +88,11 @@ class _test_pageState extends State<test_page> {
                                 wrongNumber ++;
                               });
                             },
-                            child: Text(
+                            child:const Text(
                               '間違えた…',
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                           //間違いボタンを押した回数
